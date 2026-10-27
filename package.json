@@ -31,11 +31,13 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
+    "build": "pnpm --filter @nodedr-restaurant/types build && pnpm --filter @nodedr-restaurant/backend exec prisma generate && pnpm --filter @nodedr-restaurant/backend build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "build-windows-msix": "pwsh -NoProfile -File windows/msix/build-windows-msix.ps1 && pwsh -NoProfile -File windows/msix/validate-msix.ps1"
+    "build-windows-msix": "pwsh -NoProfile -File windows/msix/build-windows-msix.ps1 && pwsh -NoProfile -File windows/msix/validate-msix.ps1",
+    "start": "pnpm --filter @nodedr-restaurant/backend exec prisma migrate deploy && pnpm --filter @nodedr-restaurant/backend start:prod",
+    "build:all": "turbo run build"
   },
   "devDependencies": {
     "turbo": "^2.10.9",
