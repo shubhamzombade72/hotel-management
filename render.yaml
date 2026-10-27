@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: nodedr-orderrestro-api
+    runtime: node
+    buildCommand: pnpm install --frozen-lockfile && pnpm run build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=384"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 12h
+      - key: CORS_ORIGIN
+        value: "*"

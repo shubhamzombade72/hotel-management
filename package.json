@@ -36,14 +36,15 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "build-windows-msix": "pwsh -NoProfile -File windows/msix/build-windows-msix.ps1 && pwsh -NoProfile -File windows/msix/validate-msix.ps1",
-    "start": "npx prisma migrate deploy --schema=apps/backend/prisma/schema.prisma && (node apps/backend/dist/src/main.js || node apps/backend/dist/main.js || node apps/backend/dist/main)",
+    "start": "prisma migrate deploy --schema=apps/backend/prisma/schema.prisma && node --max-old-space-size=384 apps/backend/dist/src/main.js",
     "build:all": "turbo run build"
   },
   "devDependencies": {
+    "prisma": "^6.19.3",
     "turbo": "^2.10.9",
     "typescript": "^5.9.3"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=20.18.0 <=22.x"
   }
 }

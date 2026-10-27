@@ -5,7 +5,8 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { AppModule } from './app.module';
 import { uploadsDir } from './common/upload/image-upload.config';
 
@@ -62,35 +63,44 @@ function isUsableSecret(secret: string): boolean {
 // impossible (e.g. the volume isn't writable) does this still refuse to
 // boot, as a last-resort safety net.
 function resolveJwtSecret(): string {
-  const envSecret = (process.env.JWT_SECRET ?? '').trim();
+  const envSecret = (process.env.JWT_SECRET ?? "").trim();
   if (isUsableSecret(envSecret)) {
     return envSecret;
   }
 
-  try {
-    if (existsSync(JWT_SECRET_STATE_FILE)) {
-      const persisted = readFileSync(JWT_SECRET_STATE_FILE, 'utf8').trim();
-      if (isUsableSecret(persisted)) {
-        return persisted;
+  const candidatePaths = [
+    JWT_SECRET_STATE_FILE,
+    join(process.cwd(), ".state", "jwt-secret"),
+    join(tmpdir(), "nodedr-jwt-secret"),
+  ];
+
+  for (const filePath of candidatePaths) {
+    try {
+      if (existsSync(filePath)) {
+        const persisted = readFileSync(filePath, "utf8").trim();
+        if (isUsableSecret(persisted)) {
+          return persisted;
+        }
       }
+      const generated = randomBytes(32).toString("hex");
+      mkdirSync(dirname(filePath), { recursive: true });
+      writeFileSync(filePath, generated, { mode: 0o600 });
+      console.warn(
+        `JWT_SECRET was not set (or was a known placeholder) — generated a random one and saved it to ${filePath}. ` +
+          "Set JWT_SECRET explicitly in your environment variables for production.",
+      );
+      return generated;
+    } catch {
+      // Try next candidate path
     }
-    const generated = randomBytes(32).toString('hex');
-    mkdirSync(dirname(JWT_SECRET_STATE_FILE), { recursive: true });
-    writeFileSync(JWT_SECRET_STATE_FILE, generated, { mode: 0o600 });
-    console.warn(
-      `JWT_SECRET was not set (or was a known placeholder) — generated a random one and saved it to ${JWT_SECRET_STATE_FILE}. ` +
-        'It will be reused on every restart, so existing sessions stay valid. Set JWT_SECRET explicitly instead if you manage this deployment by hand.',
-    );
-    return generated;
-  } catch (err) {
-    console.error(
-      `Refusing to start: JWT_SECRET is missing, a known placeholder value, or shorter than ${MIN_JWT_SECRET_LENGTH} characters, ` +
-        `and a random one could not be generated/persisted at ${JWT_SECRET_STATE_FILE}: ${err instanceof Error ? err.message : String(err)}. ` +
-        'Set a real, unique, random JWT_SECRET (e.g. `openssl rand -hex 32`) before starting the backend — ' +
-        'this protects every session this server will ever issue.',
-    );
-    process.exit(1);
   }
+
+  const ephemeral = randomBytes(32).toString("hex");
+  console.warn(
+    "JWT_SECRET was not set and filesystem is not writable — using an ephemeral in-memory secret. " +
+      "Set JWT_SECRET explicitly in your environment variables so sessions persist across restarts.",
+  );
+  return ephemeral;
 }
 
 async function bootstrap() {
@@ -133,7 +143,7 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT ?? 4000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(
     `Nodedr OrderRestro API listening on :${port} (docs at /api/docs)`,
   );
