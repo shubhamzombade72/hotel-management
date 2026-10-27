@@ -47,7 +47,7 @@ export default function SignupPage() {
         className="w-full max-w-sm"
       >
         <div className="mb-10 flex flex-col items-center gap-2 text-center">
-          <Link href="/">
+          <Link href="/dashboard">
             <Logo size={44} />
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
