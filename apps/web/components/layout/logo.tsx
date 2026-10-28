@@ -8,7 +8,7 @@ export function Logo({ className, size = 32 }: { className?: string; size?: numb
       alt="MangalMurti POS"
       width={size}
       height={size}
-      className={cn("shrink-0 rounded-lg object-contain", className)}
+      className={cn("shrink-0 rounded-full object-contain", className)}
       priority
     />
   );
