@@ -75,9 +75,9 @@ internal static class Program
         }
 
         MessageBox.Show(
-            $"Nodedr OrderRestro hit an unexpected error and needs to close.\n\n{ex.Message}\n\n" +
+            $"MangalMurti POS hit an unexpected error and needs to close.\n\n{ex.Message}\n\n" +
             $"Details were saved to:\n{AppConfig.LogDir}",
-            "Nodedr OrderRestro",
+            "MangalMurti POS",
             MessageBoxButtons.OK,
             MessageBoxIcon.Error);
     }

@@ -46,7 +46,7 @@ async function main() {
     update: {},
     create: {
       id: 'demo-restaurant',
-      name: 'Nodedr Bistro (Demo)',
+      name: 'MangalMurti Restaurant (Demo)',
       currency: 'INR',
     },
   });

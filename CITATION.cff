@@ -1,7 +1,7 @@
 cff-version: 1.2.0
-message: "If you use Nodedr OrderRestro in research, teaching, or a public project, please cite it."
+message: "If you use MangalMurti POS in research, teaching, or a public project, please cite it."
 type: software
-title: "Nodedr OrderRestro"
+title: "MangalMurti POS"
 authors:
   - family-names: Ranjit
     given-names: Raktim
